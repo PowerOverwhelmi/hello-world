@@ -1,0 +1,41 @@
+import requests
+url = 'https://ja.wikipedia.org/wiki/Reddit'
+page=requests.get(url)
+page_html=page.text
+
+
+from bs4 import BeautifulSoup
+
+soup = BeautifulSoup(page_html, "lxml")
+raw_text = soup.find_all('p')
+s_raw_text = " ".join(str(a) for a in raw_text)
+# print(raw_text)
+# print(s_raw_text)
+
+
+import re
+
+treated_string = re.sub("<(.*?)>", "█", s_raw_text, count=0, flags=0)
+polished_string = re.sub("[[].*?]","",treated_string, count=0,flags=0)
+
+# print(polished_string)
+
+
+final_string = ""
+for i in polished_string:
+    if   i != "█":
+        final_string += str(i)
+print(final_string)
+
+### Text to Speech Windows Built in###
+
+# import win32com.client as wincl
+# speak = wincl.Dispatch("SAPI.SpVoice")
+# speak.Speak(final_string)
+
+### Text to Speech Windows GTTS ###
+
+from gtts import gTTS
+
+tts = gTTS(text=final_string, lang="ja", slow=False)
+tts.save("../../wiki_speech.mp3")
